@@ -1,0 +1,27 @@
+import requests
+from bs4 import BeautifulSoup
+import time
+
+import telebot
+
+bot = telebot.TeleBot("6888363293:AAEXMlNgG3AV4syHLIitv1nk3UFi4XYqX1o")
+
+def get_price():
+    url = "https://www.binance.com/en/trade/BTC_USDT"
+
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, "html.parser")
+
+    price = soup.find("span", {"class": "price"}).text
+
+    price = float(price.replace(",", ""))
+
+    return price
+
+@bot.on(telebot.message.NewMessage)
+def handle_message(message):
+    if message.text == "/price":
+        price = get_price()
+        bot.send_message(message.chat.id, f"قیمت بیت کوین در حال حاضر: {price}")
+
+bot.polling()
